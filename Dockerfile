@@ -1,5 +1,5 @@
-FROM centos:7
-
-CMD ["gcs-copy", "version"]
+FROM gcr.io/distroless/base
 
 COPY ./build/linux/gcs-copy /usr/bin/gcs-copy
+
+CMD ["gcs-copy", "version"]
