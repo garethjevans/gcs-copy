@@ -1,0 +1,41 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "gcs-copy.name" . }}
+  labels:
+    app: {{ include "gcs-copy.name" . }}
+    chart: {{ include "gcs-copy.chart" . }}
+    release: {{ .Release.Name }}
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: {{ include "gcs-copy.name" . }}
+            release: {{ .Release.Name }}
+        spec:
+          containers:
+          - name: {{ include "gcs-copy.name" . }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            command: ["gcs-copy"]
+            env:
+            - name: BUCKET_NAME
+              value: {{ .Values.gcsBucketName }}
+            - name: COPY_FROM
+              value: {{ .Values.copyFrom }}
+            - name: COPY_TO
+              value: {{ .Values.copyTo }}
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: "/{{ .Values.secretName }}/{{ .Values.gcsServiceKeyName }}"
+            volumeMounts:
+            - name: {{ .Values.secretName }}
+              mountPath: "/{{ .Values.secretName }}"
+              readOnly: true
+          volumes:
+          - name: {{ .Values.secretName }}
+            secret:
+              secretName: {{ .Values.secretName }}
+          restartPolicy: OnFailure
