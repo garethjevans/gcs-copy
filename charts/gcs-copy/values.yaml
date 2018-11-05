@@ -12,7 +12,7 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
-gcsBucketName: jenkinsx-chartmuseum
+gcsBucketName: chartmuseum.jenkins-x.io
 copyFrom: "charts/index-cache.yaml"
 copyTo: "index.yaml"
 secretName: "gcs-jenkinsx-chartmuseum"
