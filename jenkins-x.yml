@@ -1,0 +1,35 @@
+buildPack: go
+pipelineConfig:
+ pipelines:
+   overrides:
+   - pipeline: pullRequest
+     stage: build
+     name: container-build
+     steps:
+     - name: container-build
+       command: /kaniko/executor 
+       args:
+       - --cache=true
+       - --cache-dir=/workspace
+       - --context=/workspace/source
+       - --dockerfile=/workspace/source/Dockerfile
+       - --destination=gcr.io/jenkinsxio/gcs-copy:\${inputs.params.version}
+       - --cache-repo=gcr.io/jenkinsxio/gcs-cache
+       dir: /workspace/source
+       image: gcr.io/kaniko-project/executor:9912ccbf8d22bbafbf971124600fbb0b13b9cbd6
+   - pipeline: release
+     stage: build
+     name: container-build
+     steps:
+     - name: container-build
+       command: /kaniko/executor
+       args:
+       - --cache=true
+       - --cache-dir=/workspace
+       - --context=/workspace/source
+       - --dockerfile=/workspace/source/Dockerfile
+       - --destination=gcr.io/jenkinsxio/gcs-copy:\${inputs.params.version}
+       - --destination=gcr.io/jenkinsxio/gcs-copy:latest
+       - --cache-repo=gcr.io/jenkinsxio/gcs-cache
+       dir: /workspace/source
+       image: gcr.io/kaniko-project/executor:9912ccbf8d22bbafbf971124600fbb0b13b9cbd6
